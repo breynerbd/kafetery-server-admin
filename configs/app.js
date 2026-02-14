@@ -11,6 +11,7 @@ import { requestLimit } from '../middlewares/request-limit.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
 
 import promotionRoutes from '../src/promotions/promotion.router.js';
+import orderRoutes from '../src/orders/order.router.js';
 
 const BASE_URL = '/kafetery/v1';
 
@@ -25,6 +26,7 @@ const middlewares = (app) => {
 
 const routes = (app) => {
     app.use(`${BASE_URL}/promotions`, promotionRoutes);
+    app.use(`${BASE_URL}/orders`, orderRoutes);
 }
 
 const initServer = async (app) => {

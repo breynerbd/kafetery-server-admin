@@ -13,6 +13,7 @@ import { errorHandler } from '../middlewares/handle-errors.js';
 import userRoutes from '../src/users/user.router.js';
 import menuRoutes from '../src/menus/menu.router.js';
 import promotionRoutes from '../src/promotions/promotion.router.js';
+import reservationRoutes from '../src/reservations/reservation.router.js';
 import orderRoutes from '../src/orders/order.router.js';
 import restaurantRoutes from '../src/restaurants/restaurant.router.js';
 import tableRoutes from '../src/tables/table.router.js';
@@ -33,6 +34,7 @@ const routes = (app) => {
     app.use(`${BASE_URL}/menus`, menuRoutes);
     app.use(`${BASE_URL}/promotions`, promotionRoutes);
     app.use(`${BASE_URL}/orders`, orderRoutes);
+    app.use(`${BASE_URL}/reservations`, reservationRoutes);
     app.use(`${BASE_URL}/restaurants`, restaurantRoutes)
     app.use(`${BASE_URL}/tables`, tableRoutes);
 }

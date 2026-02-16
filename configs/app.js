@@ -11,6 +11,7 @@ import { requestLimit } from '../middlewares/request-limit.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
 
 import userRoutes from '../src/users/user.router.js';
+import menuRoutes from '../src/menus/menu.router.js';
 import promotionRoutes from '../src/promotions/promotion.router.js';
 import orderRoutes from '../src/orders/order.router.js';
 import restaurantRoutes from '../src/restaurants/restaurant.router.js';
@@ -29,6 +30,7 @@ const middlewares = (app) => {
 
 const routes = (app) => {
     app.use(`${BASE_URL}/users`, userRoutes);
+    app.use(`${BASE_URL}/menus`, menuRoutes);
     app.use(`${BASE_URL}/promotions`, promotionRoutes);
     app.use(`${BASE_URL}/orders`, orderRoutes);
     app.use(`${BASE_URL}/restaurants`, restaurantRoutes)

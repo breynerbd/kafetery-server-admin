@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { initServer } from './configs/app.js';
-import { initServerUser } from '../server-user/configs/app.js';
+import { initServerUser } from '../kafetery-server-user/configs/app.js';
 
 dotenv.config();
 

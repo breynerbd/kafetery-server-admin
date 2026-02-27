@@ -2,6 +2,8 @@ import { Router } from 'express';
 import {
     getOrders,
     getOrderById,
+    getOrdersByUser,
+    getOrdersByRestaurant,
     createOrder,
     updateOrder,
     changeOrderStatus,
@@ -16,6 +18,8 @@ import {
 const router = Router();
 
 router.get('/', getOrders);
+router.get('/restaurant/:id', validateGetOrderById, getOrdersByRestaurant);
+router.get('/user/:id', validateGetOrderById, getOrdersByUser);
 router.get('/:id', validateGetOrderById, getOrderById);
 
 router.post('/', validateCreateOrder, createOrder);

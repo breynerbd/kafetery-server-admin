@@ -20,7 +20,7 @@ export const validateUpdateOrderRequest = [
         .optional()
         .isArray()
         .withMessage('Los items deben ser un arreglo'),
-    body('status').optional().isIn(['PENDING', 'PREPARING', 'DELIVERING', 'COMPLETED', 'CANCELLED']).withMessage('Estado no válido'),
+    body('status').optional().isIn(['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'CANCELED']).withMessage('Estado no válido'),
     checkValidators,
 ];
 

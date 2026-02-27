@@ -18,19 +18,12 @@ export const validateCreateReservation = [
         .withMessage('Fecha es requerida')
         .isISO8601()
         .withMessage('Fecha no válida'),
-    body('guests')
-        .notEmpty()
-        .withMessage('Número de invitados es requerido')
-        .isInt({ min: 1 })
-        .withMessage('Debe haber al menos 1 invitado'),
-    checkValidators,
 ];
 
 // Actualizar reservación
 export const validateUpdateReservationRequest = [
     param('id').isMongoId().withMessage('ID debe ser un ObjectId válido de MongoDB'),
     body('date').optional().isISO8601().withMessage('Fecha no válida'),
-    body('guests').optional().isInt({ min: 1 }).withMessage('Debe haber al menos 1 invitado'),
     checkValidators,
 ];
 

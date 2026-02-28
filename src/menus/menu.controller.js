@@ -83,4 +83,18 @@ export const changeMenuStatus = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al cambiar estado del plato', error: error.message });
     }
+
+};
+
+export const getTopMenus = async (req, res) => {
+    try {
+        const top = await Menu.find({ isActive: true })
+            .sort({ totalSold: -1 })
+            .limit(5);
+
+        res.status(200).json({ success: true, data: top });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };

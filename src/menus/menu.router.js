@@ -19,6 +19,7 @@ const router = Router();
 
 // Rutas GET
 router.get('/', getMenus);
+router.get('/top', getTopMenus);
 router.get('/:id', validateGetMenuById, getMenuById);
 
 // Rutas POST

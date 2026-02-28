@@ -1,4 +1,5 @@
 import Restaurant from './restaurant.model.js';
+import Order from '../orders/order.model.js';
 
 // Obtener todos los restaurantes
 export const getRestaurants = async (req, res) => {
@@ -82,5 +83,65 @@ export const changeRestaurantStatus = async (req, res) => {
         res.status(200).json({ success: true, message: `Restaurante ${action}`, data: restaurant });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al cambiar estado', error: error.message });
+    }
+};
+
+//Ventas
+export const getDailySales = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const orders = await Order.find({
+            restaurant: id,
+            status: "DELIVERED",
+            createdAt: { $gte: today }
+        });
+
+        const totalPrice = orders.reduce((acc, o) => acc + o.totalPrice, 0);
+
+        res.status(200).json({
+            success: true,
+            data: { totalPrice }
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+export const getMonthlySales = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const orders = await Order.find({
+            restaurant: id,
+            status: "DELIVERED",
+            createdAt: { $gte: firstDay }
+        });
+
+        const totalPrice = orders.reduce(
+            (acc, o) => acc + (o.totalPrice || o.total || 0),
+            0
+        );
+
+        res.status(200).json({
+            success: true,
+            data: { totalPrice }
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };

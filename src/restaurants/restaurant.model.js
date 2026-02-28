@@ -27,6 +27,19 @@ const restaurantSchema = new mongoose.Schema({
         trim: true,
         match: [/.+\@.+\..+/, 'Correo no válido'],
     },
+
+
+    openingTime: {
+        type: String, // "08:00"
+        required: true
+    },
+
+    closingTime: {
+        type: String, // "22:00"
+        required: true
+    },
+
+
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -40,7 +53,7 @@ const restaurantSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     }
-});
+}, { timestamps: true });
 
 restaurantSchema.index({ isActive: 1 });
 restaurantSchema.index({ name: 1 });

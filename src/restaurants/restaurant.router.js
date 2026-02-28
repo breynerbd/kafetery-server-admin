@@ -27,4 +27,7 @@ router.put('/:id', validateUpdateRestaurantRequest, updateRestaurant);
 router.put('/:id/activate', validateRestaurantStatusChange, changeRestaurantStatus);
 router.put('/:id/deactivate', validateRestaurantStatusChange, changeRestaurantStatus);
 
+router.get('/:id/dailySales', getDailySales);
+router.get('/:id/monthlySales', getMonthlySales);
+
 export default router;

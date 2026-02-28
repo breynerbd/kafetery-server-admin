@@ -118,6 +118,31 @@ export const createOrder = async (req, res) => {
             await menu.save();
         }
 
+
+
+        const now = new Date();
+        const promotions = await Promotion.find({
+            restaurant,
+            isActive: true,
+            validFrom: { $lte: now },
+            validTo: { $gte: now }
+        });
+
+        let discount = 0;
+
+        for (const promo of promotions) {
+            if (promo.type === 'PERCENTAGE')
+                discount += subtotal * (promo.value / 100);
+
+            if (promo.type === 'FIXED')
+                discount += promo.value;
+
+            if (promo.type === 'MIN_PURCHASE' && subtotal >= promo.minPurchase)
+                discount += promo.value;
+        }
+
+        const totalPrice = subtotal - discount;
+
         const order = new Order({
             user,
             restaurant,

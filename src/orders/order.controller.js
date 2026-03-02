@@ -118,7 +118,22 @@ export const createOrder = async (req, res) => {
             await menu.save();
         }
 
+        let table = req.body.table;
 
+        if (!table) {
+            const availableTable = await Table.findOne({
+                restaurant,
+                status: 'AVAILABLE',
+                isActive: true
+            });
+
+            if (!availableTable)
+                return res.status(400).json({ success: false, message: 'No hay mesas disponibles' });
+
+            table = availableTable._id;
+            availableTable.status = 'OCCUPIED';
+            await availableTable.save();
+        }
 
         const now = new Date();
         const promotions = await Promotion.find({

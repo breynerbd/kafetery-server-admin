@@ -1,4 +1,5 @@
 import Reservation from './reservation.model.js';
+import Table from '../tables/table.model.js'
 
 // Obtener todas las reservaciones con paginación y filtros
 export const getReservations = async (req, res) => {
@@ -49,12 +50,40 @@ export const getReservationById = async (req, res) => {
 // Crear reservación
 export const createReservation = async (req, res) => {
     try {
+        const { table, date, people } = req.body;
+
+        const tableData = await Table.findById(table);
+        if (!tableData)
+            return res.status(404).json({ success: false, message: 'Mesa no encontrada' });
+
+        if (people > tableData.capacity)
+            return res.status(400).json({
+                success: false,
+                message: 'La cantidad de personas excede la capacidad'
+            });
+
+        const existing = await Reservation.findOne({
+            table,
+            date,
+            isActive: true
+        });
+
+        if (existing)
+            return res.status(400).json({
+                success: false,
+                message: 'La mesa ya está reservada en ese horario'
+            });
+
         const reservation = new Reservation(req.body);
         await reservation.save();
 
-        res.status(201).json({ success: true, message: 'Reservación creada', data: reservation });
+        tableData.status = 'RESERVED';
+        await tableData.save();
+
+        res.status(201).json({ success: true, data: reservation });
+
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al crear reservación', error: error.message });
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 

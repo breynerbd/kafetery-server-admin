@@ -5,6 +5,8 @@ import {
     createRestaurant,
     updateRestaurant,
     changeRestaurantStatus,
+    getDailySales,
+    getMonthlySales
 } from './restaurant.controller.js';
 import {
     validateCreateRestaurant,

@@ -5,6 +5,7 @@ import {
     createMenu,
     updateMenu,
     changeMenuStatus,
+    getTopMenus
 } from './menu.controller.js';
 import {
     validateCreateMenu,

@@ -189,12 +189,17 @@ export const createOrder = async (req, res) => {
 
 export const updateOrder = async (req, res) => {
     try {
+
         const { id } = req.params;
         const { status } = req.body;
 
         const order = await Order.findById(id);
+
         if (!order)
-            return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+            return res.status(404).json({
+                success: false,
+                message: 'Pedido no encontrado'
+            });
 
         const allowedTransitions = {
             PENDING: ['CONFIRMED', 'CANCELED'],
@@ -205,20 +210,41 @@ export const updateOrder = async (req, res) => {
             CANCELED: []
         };
 
-        if (!allowedTransitions[order.status].includes(status))
+        if (!allowedTransitions[order.status].includes(status)) {
             return res.status(400).json({
                 success: false,
                 message: `No puedes cambiar de ${order.status} a ${status}`
             });
+        }
 
         order.status = status;
 
+        if (status === "DELIVERED") {
+
+            const user = await User.findById(order.user);
+
+            if (user) {
+                user.loyaltyPoints += Math.floor(order.totalPrice / 10);
+                user.totalOrders += 1;
+
+                await user.save();
+            }
+        }
+
         await order.save();
 
-        res.status(200).json({ success: true, data: order });
+        res.status(200).json({
+            success: true,
+            data: order
+        });
 
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+
     }
 };
 

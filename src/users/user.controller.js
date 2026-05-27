@@ -1,4 +1,5 @@
 import User from './user.model.js';
+import axios from "axios";
 
 // Obtener todos los usuarios con paginación y filtro por isActive
 export const getUsers = async (req, res) => {
@@ -50,27 +51,118 @@ export const getUserById = async (req, res) => {
 // Crear usuario
 export const createUser = async (req, res) => {
     try {
-        const user = new User(req.body);
-        await user.save();
 
-        res.status(201).json({ success: true, message: 'Usuario creado', data: user });
+        const {
+            name,
+            surname,
+            username,
+            email,
+            password,
+            role
+        } = req.body;
+
+        const existingUser = await User.findOne({
+            $or: [
+                { email },
+                { username }
+            ]
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: "El usuario ya existe"
+            });
+        }
+
+        const authResponse = await axios.post(
+            "http://localhost:5070/api/auth/register",
+            {
+                name,
+                surname,
+                username,
+                email,
+                password
+            }
+        );
+        console.log(authResponse.data);
+
+        console.log(authResponse.data);
+
+        const auth_id =
+            authResponse.data.user?._id ||
+            authResponse.data.user?.id ||
+            authResponse.data.data?._id ||
+            authResponse.data.data?.id ||
+            authResponse.data._id ||
+            authResponse.data.id;
+
+        console.log("AUTH_ID:", auth_id);
+
+        const user = await User.create({
+            auth_id,
+            name,
+            surname,
+            username,
+            email,
+            password,
+            role
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Usuario creado correctamente",
+            data: user
+        });
+
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al crear usuario', error: error.message });
+
+        console.log(error.response?.data || error.message);
+
+        return res.status(400).json({
+            success: false,
+            message: "Error al crear usuario",
+            error: error.response?.data || error.message
+        });
     }
 };
 
 // Actualizar usuario
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
     try {
+
         const { id } = req.params;
-        const user = await User.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
 
-        if (!user)
-            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        const updateData = { ...req.body };
 
-        res.status(200).json({ success: true, message: 'Usuario actualizado', data: user });
+        if (!updateData.password?.trim()) {
+            delete updateData.password;
+        }
+
+        const user = await User.findByIdAndUpdate(
+            id,
+            updateData,
+            {
+                returnDocument: "after",
+                runValidators: true
+            }
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Usuario actualizado",
+            data: user
+        });
+
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al actualizar usuario', error: error.message });
+        next(error);
     }
 };
 

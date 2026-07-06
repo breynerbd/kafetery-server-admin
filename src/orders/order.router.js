@@ -7,6 +7,7 @@ import {
     createOrder,
     updateOrder,
     changeOrderStatus,
+    checkoutOrder,
 } from './order.controller.js';
 import {
     validateCreateOrder,
@@ -27,5 +28,10 @@ router.post('/', validateCreateOrder, createOrder);
 router.put('/:id', validateUpdateOrderRequest, updateOrder);
 router.put('/:id/activate', validateOrderStatusChange, changeOrderStatus);
 router.put('/:id/deactivate', validateOrderStatusChange, changeOrderStatus);
+
+router.put(
+    "/:id/checkout",
+    checkoutOrder
+);
 
 export default router;

@@ -1,6 +1,5 @@
 import Menu from './menu.model.js';
 
-// Obtener todos los platos con paginación y filtros
 export const getMenus = async (req, res) => {
     try {
         const { page = 1, limit = 10, isActive = true } = req.query;
@@ -29,7 +28,6 @@ export const getMenus = async (req, res) => {
     }
 };
 
-// Obtener plato por ID
 export const getMenuById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -43,33 +41,89 @@ export const getMenuById = async (req, res) => {
     }
 };
 
-// Crear nuevo plato
-export const createMenu = async (req, res) => {
+export const getMenusByRestaurant = async (req, res) => {
     try {
-        const menu = new Menu(req.body);
-        await menu.save();
+        const { restaurant } = req.params;
+        const menus = await Menu.find({ restaurant, isActive: true }).populate('restaurant', 'name');
 
-        res.status(201).json({ success: true, message: 'Plato creado exitosamente', data: menu });
+        res.status(200).json({ success: true, data: menus });
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al crear plato', error: error.message });
+        res.status(500).json({ success: false, message: 'Error al obtener los platos', error: error.message });
     }
 };
 
-// Actualizar plato
+export const createMenu = async (req, res) => {
+    try {
+        const menuData = {
+            ...req.body,
+        };
+
+        if (req.file) {
+            menuData.image = req.file.path;
+        }
+
+        const menu = new Menu(menuData);
+
+        await menu.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Plato creado exitosamente',
+            data: menu,
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'Error al crear plato',
+            error: error.message,
+        });
+    }
+};
+
 export const updateMenu = async (req, res) => {
     try {
         const { id } = req.params;
-        const menu = await Menu.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
 
-        if (!menu) return res.status(404).json({ success: false, message: 'Plato no encontrado' });
+        const updateData = {
+            ...req.body,
+        };
 
-        res.status(200).json({ success: true, message: 'Plato actualizado', data: menu });
+        if (req.file) {
+            updateData.image = req.file.path;
+        }
+
+        const menu = await Menu.findByIdAndUpdate(
+            id,
+            updateData,
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+
+        if (!menu) {
+            return res.status(404).json({
+                success: false,
+                message: 'Plato no encontrado',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Plato actualizado',
+            data: menu,
+        });
+
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al actualizar plato', error: error.message });
+        res.status(400).json({
+            success: false,
+            message: 'Error al actualizar plato',
+            error: error.message,
+        });
     }
 };
 
-// Cambiar estado del plato
 export const changeMenuStatus = async (req, res) => {
     try {
         const { id } = req.params;

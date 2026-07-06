@@ -5,15 +5,14 @@ import { checkValidators } from './check-validators.js';
 export const validateCreateRestaurant = [
     body('name')
         .trim()
-        .notEmpty()
-        .withMessage('El nombre es requerido')
-        .isLength({ min: 2, max: 100 })
-        .withMessage('El nombre debe tener entre 2 y 100 caracteres'),
-    body('address')
-        .notEmpty()
-        .withMessage('La dirección es requerida')
-        .isLength({ max: 200 })
-        .withMessage('La dirección no puede exceder 200 caracteres'),
+        .notEmpty().withMessage('El nombre es requerido')
+        .isLength({ min: 2, max: 100 }).withMessage('El nombre debe tener entre 2 y 100 caracteres'),
+
+    // Validación para el objeto location
+    body('location').notEmpty().withMessage('La ubicación es requerida'),
+    body('location.latitude').isNumeric().withMessage('La latitud debe ser un número'),
+    body('location.longitude').isNumeric().withMessage('La longitud debe ser un número'),
+
     checkValidators,
 ];
 
@@ -23,12 +22,13 @@ export const validateUpdateRestaurantRequest = [
     body('name')
         .optional()
         .trim()
-        .isLength({ min: 2, max: 100 })
-        .withMessage('El nombre debe tener entre 2 y 100 caracteres'),
-    body('address')
-        .optional()
-        .isLength({ max: 200 })
-        .withMessage('La dirección no puede exceder 200 caracteres'),
+        .isLength({ min: 2, max: 100 }).withMessage('El nombre debe tener entre 2 y 100 caracteres'),
+
+    // Validaciones opcionales para location si se está actualizando
+    body('location').optional(),
+    body('location.latitude').optional().isNumeric().withMessage('La latitud debe ser un número'),
+    body('location.longitude').optional().isNumeric().withMessage('La longitud debe ser un número'),
+
     checkValidators,
 ];
 

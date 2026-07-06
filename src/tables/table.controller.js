@@ -10,6 +10,7 @@ export const getTables = async (req, res) => {
         const options = { page: parseInt(page), limit: parseInt(limit), sort: { tableNumber: 1 } };
 
         const tables = await Table.find(filter)
+            .populate("restaurant", "name")
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .sort(options.sort);
@@ -35,7 +36,7 @@ export const getTables = async (req, res) => {
 export const getTableById = async (req, res) => {
     try {
         const { id } = req.params;
-        const table = await Table.findById(id);
+        const table = await Table.findById(id).populate("restaurant", "name");
         if (!table) return res.status(404).json({ success: false, message: "Mesa no encontrada" });
 
         res.status(200).json({ success: true, data: table });

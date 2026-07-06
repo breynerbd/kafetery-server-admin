@@ -5,7 +5,8 @@ import {
     createMenu,
     updateMenu,
     changeMenuStatus,
-    getTopMenus
+    getTopMenus,
+    getMenusByRestaurant
 } from './menu.controller.js';
 import {
     validateCreateMenu,
@@ -22,6 +23,7 @@ const router = Router();
 router.get('/', getMenus);
 router.get('/top', getTopMenus);
 router.get('/:id', validateGetMenuById, getMenuById);
+router.get('/restaurant/:restaurant', getMenusByRestaurant);
 
 // Rutas POST
 router.post(

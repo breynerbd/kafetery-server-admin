@@ -1,7 +1,6 @@
 import Restaurant from './restaurant.model.js';
 import Order from '../orders/order.model.js';
 
-// Obtener todos los restaurantes
 export const getRestaurants = async (req, res) => {
     try {
         const { page = 1, limit = 10, isActive = true } = req.query;
@@ -30,7 +29,6 @@ export const getRestaurants = async (req, res) => {
     }
 };
 
-// Obtener restaurante por ID
 export const getRestaurantById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -44,33 +42,70 @@ export const getRestaurantById = async (req, res) => {
     }
 };
 
-// Crear restaurante
 export const createRestaurant = async (req, res) => {
     try {
-        const restaurant = new Restaurant(req.body);
+        const { name, description, phone, email, openingTime, closingTime, owner, location } = req.body;
+
+        const loc = typeof location === 'string' ? JSON.parse(location) : location;
+
+        const restaurant = new Restaurant({
+            name,
+            description,
+            phone,
+            email,
+            openingTime,
+            closingTime,
+            owner,
+            location: {
+                latitude: Number(loc.latitude),
+                longitude: Number(loc.longitude)
+            }
+        });
+
         await restaurant.save();
 
-        res.status(201).json({ success: true, message: 'Restaurante creado', data: restaurant });
+        res.status(201).json({ success: true, message: "Restaurante creado", data: restaurant });
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al crear restaurante', error: error.message });
+        res.status(400).json({ success: false, message: "Error al crear restaurante", error: error.message });
     }
 };
 
-// Actualizar restaurante
 export const updateRestaurant = async (req, res) => {
     try {
         const { id } = req.params;
-        const restaurant = await Restaurant.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+        const { name, description, phone, email, openingTime, closingTime, owner, location } = req.body;
 
-        if (!restaurant) return res.status(404).json({ success: false, message: 'Restaurante no encontrado' });
+        const loc = typeof location === 'string' ? JSON.parse(location) : location;
 
-        res.status(200).json({ success: true, message: 'Restaurante actualizado', data: restaurant });
+        const updatedData = {
+            name,
+            description,
+            phone,
+            email,
+            openingTime,
+            closingTime,
+            owner,
+            location: {
+                latitude: Number(loc.latitude),
+                longitude: Number(loc.longitude)
+            }
+        };
+
+        const restaurant = await Restaurant.findByIdAndUpdate(id, updatedData, {
+            new: true,
+            runValidators: true
+        });
+
+        if (!restaurant) {
+            return res.status(404).json({ success: false, message: "Restaurante no encontrado" });
+        }
+
+        res.status(200).json({ success: true, message: "Restaurante actualizado", data: restaurant });
     } catch (error) {
-        res.status(400).json({ success: false, message: 'Error al actualizar restaurante', error: error.message });
+        res.status(400).json({ success: false, message: "Error al actualizar restaurante", error: error.message });
     }
 };
 
-// Cambiar estado
 export const changeRestaurantStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -86,7 +121,6 @@ export const changeRestaurantStatus = async (req, res) => {
     }
 };
 
-//Ventas
 export const getDailySales = async (req, res) => {
     try {
         const { id } = req.params;

@@ -1,164 +1,253 @@
-# GestionKafetery
-☕ GestionKafetery
+# ☕ Kafetery Server - Admin Service
 
-Sistema de gestión para restaurantes que permite administrar usuarios, restaurantes, menús, órdenes, reservaciones, promociones y mesas.
+Backend administrativo del sistema **Kafetery**.  
+Este servicio permite a los administradores gestionar todos los recursos del sistema:
 
-📦 Configuración del Proyecto
-1️⃣ Instalación de MongoDB
+- Usuarios  
+- Restaurantes  
+- Menús  
+- Órdenes  
+- Promociones  
+- Reservaciones  
+- Mesas  
 
-Instala MongoDB en tu máquina local:
+Además incluye **validaciones, manejo de archivos, control de errores y limitación de peticiones**.
 
-👉 Descarga oficial:
-MongoDB
+---
 
-Configura tu conexión local:
+# 🚀 Tecnologías Utilizadas
 
-mongodb://localhost:27017/kafetery
+- **Node.js** – Entorno de ejecución  
+- **Express.js** – Framework para API REST  
+- **MongoDB** – Base de datos NoSQL  
+- **Mongoose** – Modelado de datos  
+- **Helmet** – Seguridad HTTP  
+- **CORS** – Control de acceso entre dominios  
+- **Multer** – Subida de archivos  
+- **Express Validator** – Validación de datos  
 
-2️⃣ Configuración del archivo .env
+---
 
-Cada servidor debe tener su propio archivo .env.
+# 📁 Estructura del Proyecto
 
-PORT=3000
-NODE_ENV=development
-URL_MONGODB=mongodb://localhost:27017/kafetery
+```
+kafeteria-server-admin
+│
+├── configs
+│   ├── app.js
+│   ├── cors-configuration.js
+│   ├── db.js
+│   └── helmet-configuration.js
+│
+├── middlewares
+│   ├── check-validators.js
+│   ├── delete-file-on-error.js
+│   ├── file-uploader.js
+│   ├── handle-errors.js
+│   ├── menu-validators.js
+│   ├── order-validators.js
+│   ├── promotion-validators.js
+│   ├── request-limit.js
+│   ├── reservation-validators.js
+│   ├── restaurant-validators.js
+│   ├── table-validators.js
+│   └── user-validators.js
+│
+├── src
+│   ├── internals
+│   ├── menus
+│   ├── orders
+│   ├── promotions
+│   ├── reservations
+│   ├── restaurants
+│   ├── tables
+│   └── users
+│
+├── .env
+├── index.js
+├── package.json
+└── README.md
+```
 
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=die1jjc0t
-CLOUDINARY_API_KEY=544917921614231
-CLOUDINARY_API_SECRET=uCwKJpWMpBcfHplTe2tKcFzXuPw
-CLOUDINARY_MENUS_FOLDER=kafetery/menus
+---
 
-📥 Instalación de Dependencias
-🔹 Server Admin
-npm install axios@^1.13.5 bcrypt@^6.0.0 cors@^2.8.6 dotenv@^17.3.1 \
-express@^5.2.1 express-rate-limit@^8.2.1 express-validator@^7.3.1 \
-helmet@^8.1.0 jsonwebtoken@^9.0.3 morgan@^1.10.1 nanoid@^5.1.6 \
-pg@^8.18.0 pghstore@^2.3.4 sequelize@^6.37.7 uuid@^13.0.0
+# ⚙️ Instalación
 
-🔹 User Admin
-npm install cors@^2.8.6 dotenv@^17.3.1 express@^5.2.1 \
-helmet@^8.1.0 morgan@^1.10.1 pg@^8.18.0 \
-pg-hstore@^2.3.4 sequelize@^6.37.7
+## 1️⃣ Clonar repositorio
 
-npm install -D nodemon@^3.1.11
+```bash
+git clone https://github.com/tu-repositorio/kafetery-server-admin.git
+cd kafetery-server-admin
+```
 
-🔹 Server-Admin & Server-User (MongoDB + Cloudinary)
-npm install axios@^1.13.5 cloudinary@^1.41.3 cors@^2.8.6 \
-dotenv@^17.3.1 express@^5.2.1 express-rate-limit@^8.2.1 \
-express-validator@^7.3.1 helmet@^8.1.0 jsonwebtoken@^9.0.3 \
-mongoose@^9.2.1 morgan@^1.10.1 multer@^2.0.2 \
-multer-storage-cloudinary@^4.0.0 uuid@^13.0.0
+## 2️⃣ Instalar dependencias
 
-🚀 Uso de Postman
+```bash
+npm install
+```
 
-Recomendado usar:
-Postman
+## 3️⃣ Variables de entorno
 
-🔐 SERVER ADMIN API
-Base URL:
-http://localhost:3000/kafetery/v1
+Crear archivo `.env`
 
-👤 Usuarios
-Método	Endpoint	Descripción
-GET	/users	Listar todos los usuarios
-GET	/users/{id}	Obtener usuario por ID
-POST	/users	Crear usuario
-PUT	/users/{id}	Actualizar usuario
-Roles disponibles:
+```
+PORT=3001
+MONGO_URI=mongodb://localhost:27017/kafetery
+```
 
-CLIENT
-RESTAURANT_ADMIN
-PLATFORM_ADMIN
+## 4️⃣ Ejecutar servidor
 
-🏪 Restaurantes
-Método	Endpoint
-GET	/restaurants
-GET	/restaurants/{id}
-PUT	/restaurants
+```bash
+npm run dev
+```
 
-🍔 Menús
-Método	Endpoint
-GET	/menus
-GET	/menus/{id}
-POST	/menus
-PUT	/menus/{id}
+o
 
-🧾 Órdenes
-Método	Endpoint
-GET	/orders
-GET	/orders/{id}
-POST	/orders
-PUT	/orders/{id}
+```bash
+node index.js
+```
 
-Estados posibles:
-PENDING
-PREPARING
-COMPLETED
-CANCELLED
+---
 
-📅 Reservaciones
-Método	Endpoint
-GET	/reservations
-GET	/reservations/{id}
-POST	/reservations
-PUT	/reservations/{id}
+# 📡 Endpoints
 
-Estados:
-PENDING
-CONFIRMED
-CANCELLED
+## 🔐 Internal Routes
 
-🎉 Promociones
-Método	Endpoint
-GET	/promotions
-GET	/promotions/{id}
-POST	/promotions
-PUT	/promotions/{id}
+### Sincronizar usuario desde servicio de autenticación
 
-🪑 Mesas
-Método	Endpoint
-GET	/tables
-GET	/tables/{id}
-PUT	/tables/{id}
+```
+POST /internals/sync-user
+```
 
-👥 SERVER USER API
-Base URL:
-http://localhost:3002/kafetery/user/v1
+Permite sincronizar usuarios desde el **servicio de autenticación** al sistema administrativo.
 
-🍽 Menús
-GET /menus
+---
 
-🏪 Restaurantes
-GET /restaurants
+# 🍔 Menus
 
-🎉 Promociones
-GET /promotions
+| Método | Endpoint | Descripción |
+|------|------|------|
+| GET | `/menus` | Obtener todos los menús |
+| GET | `/menus/top` | Obtener menús más vendidos |
+| GET | `/menus/:id` | Obtener menú por ID |
+| POST | `/menus` | Crear menú |
+| PUT | `/menus/:id` | Actualizar menú |
+| PUT | `/menus/:id/activate` | Activar menú |
+| PUT | `/menus/:id/deactivate` | Desactivar menú |
 
-🪑 Mesas
-GET /tables
-GET /tables?restaurantId=RESTAURANT_ID
+### Crear menú incluye
 
-🧾 Órdenes
-GET /orders
-GET /orders?userId=USER_ID
-GET /orders?restaurantId=RESTAURANT_ID
-GET /orders?status=PENDING
+- Subida de imagen  
+- Validación de datos  
+- Manejo de errores de archivos  
 
-📅 Reservaciones
-GET /reservations
-POST /reservations
+---
 
-🏗 Arquitectura
+# 🧾 Orders
 
-El sistema está dividido en:
-Server-Admin → Gestión completa del sistema
-Server-User → Consultas y acciones para clientes
-MongoDB → Base de datos principal
-Cloudinary → Gestión de imágenes
-🛠 Tecnologías Utilizadas
-Node.js
-Express
-MongoDB
-Mongoose
-Cloudinary
+| Método | Endpoint |
+|------|------|
+| GET | `/orders` |
+| GET | `/orders/:id` |
+| GET | `/orders/restaurant/:id` |
+| GET | `/orders/user/:id` |
+| POST | `/orders` |
+| PUT | `/orders/:id` |
+| PUT | `/orders/:id/activate` |
+| PUT | `/orders/:id/deactivate` |
+
+---
+
+# 🎟️ Promociones
+
+| Método | Endpoint |
+|------|------|
+| GET | `/promotions` |
+| GET | `/promotions/:id` |
+| POST | `/promotions` |
+| PUT | `/promotions/:id` |
+| PUT | `/promotions/:id/activate` |
+| PUT | `/promotions/:id/deactivate` |
+
+---
+
+# 📅 Reservaciones
+
+| Método | Endpoint |
+|------|------|
+| GET | `/reservations` |
+| GET | `/reservations/:id` |
+| POST | `/reservations` |
+| PUT | `/reservations/:id` |
+| PUT | `/reservations/:id/activate` |
+| PUT | `/reservations/:id/deactivate` |
+
+---
+
+# 🏪 Restaurantes
+
+| Método | Endpoint |
+|------|------|
+| GET | `/restaurants` |
+| GET | `/restaurants/:id` |
+| POST | `/restaurants` |
+| PUT | `/restaurants/:id` |
+| PUT | `/restaurants/:id/activate` |
+| PUT | `/restaurants/:id/deactivate` |
+
+---
+
+# 📊 Reportes de Ventas
+
+### Ventas diarias
+
+```
+GET /restaurants/:id/dailySales
+```
+
+### Ventas mensuales
+
+```
+GET /restaurants/:id/monthlySales
+```
+
+---
+
+# 🪑 Tables
+
+| Método | Endpoint |
+|------|------|
+| GET | `/tables` |
+| GET | `/tables/:id` |
+| POST | `/tables` |
+| PUT | `/tables/:id` |
+| PUT | `/tables/:id/activate` |
+| PUT | `/tables/:id/deactivate` |
+
+---
+
+# 👤 Users
+
+| Método | Endpoint |
+|------|------|
+| GET | `/users` |
+| GET | `/users/:id` |
+| POST | `/users` |
+| PUT | `/users/:id` |
+| PUT | `/users/:id/activate` |
+| PUT | `/users/:id/deactivate` |
+
+---
+
+# 🛡️ Middlewares Incluidos
+
+El sistema incluye middlewares para:
+
+- Validación de datos
+- Manejo centralizado de errores
+- Eliminación automática de archivos en caso de error
+- Subida de imágenes
+- Seguridad HTTP
+- Control de CORS
+- Limitación de peticiones
+```

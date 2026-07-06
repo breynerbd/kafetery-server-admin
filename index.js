@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { initServer } from './configs/app.js';
-import { initServerUser } from '../server-user/configs/app.js';
 
 dotenv.config();
 
@@ -16,4 +15,3 @@ process.on('unhandledRejection', (reason, promise) => {
 
 console.log('Iniciando servidor de Kafetery...');
 initServer();
-initServerUser();

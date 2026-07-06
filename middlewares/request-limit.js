@@ -1,23 +1,25 @@
 import rateLimit from 'express-rate-limit';
- 
+
 export const requestLimit = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // Límite de 100 requests por ventana de tiempo por IP
+    windowMs: 10 * 60 * 1000,
+    max: 1000,
     message: {
         success: false,
-        message: 'Demasiadas peticiones desde esta IP, intenta de nuevo más tarde.',
+        message: 'Kafetery System: Se ha detectado un tráfico inusual. Por seguridad, espera un momento.',
         error: 'RATE_LIMIT_EXCEEDED',
     },
-    standardHeaders: true, // Retorna rate limit info en los headers `RateLimit-*`
-    legacyHeaders: false, // Desactiva los headers `X-RateLimit-*`
+    
+    standardHeaders: true, 
+    legacyHeaders: false, 
+    
     handler: (req, res) => {
-        console.log(`Rate limit exceeded for IP: ${req.ip}, Path: ${req.path}`);
+        console.warn(`[RATE LIMIT] IP: ${req.ip} | Ruta: ${req.path} | Usuario: ${req.user?.username || 'Anónimo'}`);
+        
         res.status(429).json({
             success: false,
-            message:
-                'Demasiadas peticiones desde esta IP, intenta de nuevo más tarde.',
+            message: 'Has realizado demasiadas solicitudes. El acceso se restaurará pronto.',
             error: 'RATE_LIMIT_EXCEEDED',
             retryAfter: Math.round((req.rateLimit.resetTime - Date.now()) / 1000),
         });
-    },
+    }
 });

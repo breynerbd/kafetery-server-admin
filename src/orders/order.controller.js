@@ -100,21 +100,46 @@ export const createOrder = async (req, res) => {
         let estimatedTime = 0;
 
         for (const item of items) {
+
             const menu = await Menu.findById(item.menu);
 
-            if (!menu || !menu.isActive)
-                return res.status(400).json({ success: false, message: 'Plato no disponible' });
+            if (!menu || !menu.isActive) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Plato no disponible"
+                });
+            }
 
-            if (menu.stock < item.quantity)
-                return res.status(400).json({ success: false, message: `Stock insuficiente para ${menu.name}` });
+            if (item.quantity <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Cantidad inválida."
+                });
+            }
+
+            if (item.quantity > menu.stock) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Solo hay ${menu.stock} unidades disponibles de ${menu.name}`
+                });
+            }
 
             subtotal += menu.price * item.quantity;
             estimatedTime += menu.prepTime * item.quantity;
+        }
+
+        for (const item of items) {
+
+            const menu = await Menu.findById(item.menu);
 
             menu.stock -= item.quantity;
             menu.totalSold += item.quantity;
 
-            if (menu.stock === 0) menu.status = 'OUT_OF_STOCK';
+            if (menu.stock <= 0) {
+                menu.stock = 0;
+                menu.status = "OUT_OF_STOCK";
+            }
+
             await menu.save();
         }
 
@@ -182,6 +207,24 @@ export const createOrder = async (req, res) => {
             data: order
         });
 
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+export const checkoutOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findById(id);
+        if (!order)
+            return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+        order.status = 'DELIVERED';
+        await order.save();
+        res.status(200).json({
+            success: true,
+            message: 'Pedido entregado',
+            data: order
+        });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
@@ -260,5 +303,68 @@ export const changeOrderStatus = async (req, res) => {
         res.status(200).json({ success: true, message: `Pedido ${action}`, data: order });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al cambiar estado del pedido', error: error.message });
+    }
+};
+
+export const deleteOrder = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        const order = await Order.findByIdAndDelete(id);
+
+        if (!order)
+            return res.status(404).json({
+                success: false,
+                message: 'Pedido no encontrado'
+            });
+
+        if (order.status === 'DELIVERED') {
+            return res.status(400).json({
+                success: false,
+                message: 'No se puede eliminar un pedido entregado'
+            });
+        }
+
+        if (order.status === 'CANCELED') {
+            return res.status(400).json({
+                success: false,
+                message: 'No se puede eliminar un pedido cancelado'
+            });
+        }
+
+        for (const item of order.items) {
+            const menu = await Menu.findById(item.menu);
+            menu.stock += item.quantity;
+            menu.totalSold -= item.quantity;
+            await menu.save();
+        }
+
+        if (order.table) {
+            const table = await Table.findById(order.table);
+            table.status = 'AVAILABLE';
+            await table.save();
+        }
+
+        if (order.user) {
+            const user = await User.findById(order.user);
+            user.loyaltyPoints -= Math.floor(order.totalPrice / 10);
+            user.totalOrders -= 1;
+            await user.save();
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Pedido eliminado',
+            data: order
+        });
+
+    } catch (err) {
+        console.error(err);
+        console.error(err.stack);
+
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };
